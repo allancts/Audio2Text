@@ -1,0 +1,16 @@
+# Ignorer tout sauf les fichiers et dossiers spécifiés
+
+# Ignorer tout par défaut
+*
+
+# Ne pas ignorer ces fichiers et dossiers
+!README.md
+!Audio2Text.py
+!INPUTS/
+
+# Ignorer le contenu du dossier INPUTS y compris les sous-dossiers
+INPUTS/*
+INPUTS/**
+
+# Ignorer complètement le dossier OUTPUTS
+OUTPUTS/
