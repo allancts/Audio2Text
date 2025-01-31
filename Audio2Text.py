@@ -41,8 +41,12 @@ def detect_silences(audio, silence_thresh=-40, min_silence_len=700):
     logging.info(f"{len(silence_chunks)} silences détectés.")
     return [(start / 1000, end / 1000) for start, end in silence_chunks]  # Convertir en secondes
 
-def split_audio_on_silence(audio, silence_chunks):
+def split_audio_on_silence(audio, silence_chunks, enable_segmentation=True):
     """ Découpe l'audio en segments en fonction des silences détectés. """
+    if not enable_segmentation:
+        logging.info("Segmentation désactivée, utilisation de l'audio entier.")
+        return [(0, len(audio) / 1000)]
+    
     logging.info("Découpage de l'audio en segments...")
     segments = []
     prev_end = 0
@@ -64,8 +68,8 @@ def transcribe_audio(segments, audio, model):
         segment_path = f"segment_{i}.wav"
         segment_audio.export(segment_path, format="wav")
         
-        # Transcription du segment
-        result = model.transcribe(segment_path)
+        # Transcription du segment avec langue forcée en français
+        result = model.transcribe(segment_path, language="fr")
         transcription.append(f"[Orateur {i+1}] {result['text']}\n")
         
         # Nettoyage du fichier temporaire
@@ -95,8 +99,9 @@ def main():
     # Détection des silences
     silence_chunks = detect_silences(audio)
     
-    # Découpage de l'audio
-    segments = split_audio_on_silence(audio, silence_chunks)
+    # Découpage de l'audio (peut être désactivé)
+    enable_segmentation = False  # Désactiver le découpage en segments
+    segments = split_audio_on_silence(audio, silence_chunks, enable_segmentation)
     
     # Transcription
     transcription = transcribe_audio(segments, audio, model)
